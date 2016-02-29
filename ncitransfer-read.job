@@ -1,0 +1,28 @@
+#!/bin/bash -l
+#SBATCH --partition=copyq
+#SBATCH --cluster=zeus
+#SBATCH --ntasks=1
+#SBATCH --account=director569
+#SBATCH --time=01:00:00
+#SBATCH --export=SYNC_DIRS,NCI_DIR,SCRATCH_DIR,NCI_USER,NCI_PASSWORD,ATERM,ASHELL
+
+module load python
+module load java/8u40
+
+IFS=',' read -r -a DIRS <<< "$SYNC_DIRS"
+
+cd "$SCRATCH_DIR" || exit 1
+cp "$ATERM" . || exit 1
+cp "$ASHELL" . || exit 1
+
+for syncdir in "${DIRS[@]}"
+do
+  #Look for .ers files in each of our syncdirs
+  python ashell.py "domain public + login public public + lf $syncdir" | awk '{print $4}' | grep '\.ers$' | while read -r ersfile ; do
+    datafile=${ersfile%%.*}
+    echo "ersfile=$ersfile"
+    echo "datafile=$datafile"
+    python ashell.py "domain public + login public public + get ${syncdir}/${ersfile} + get ${syncdir}/${datafile}"
+  done
+done
+
