@@ -1,0 +1,14 @@
+#!/bin/bash -l
+#SBATCH --partition=copyq
+#SBATCH --cluster=zeus
+#SBATCH --ntasks=1
+#SBATCH --account=director569
+#SBATCH --time=01:00:00
+#SBATCH --export=SYNC_DIRS,NCI_DIR,SCRATCH_DIR,NCI_USER,NCI_PASSWORD,ATERM,ASHELL
+
+pushd `pwd`
+cp "sync.sh" "$SCRATCH_DIR" || exit 1
+cd "$SCRATCH_DIR" || exit 1
+
+./sync.sh "$NCI_USER" "$NCI_PASSWORD" "$NCI_DIR" || exit 1
+

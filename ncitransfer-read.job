@@ -11,6 +11,7 @@ module load java/8u40
 
 IFS=',' read -r -a DIRS <<< "$SYNC_DIRS"
 
+pushd `pwd`
 cd "$SCRATCH_DIR" || exit 1
 cp "$ATERM" . || exit 1
 cp "$ASHELL" . || exit 1
@@ -20,9 +21,10 @@ do
   #Look for .ers files in each of our syncdirs
   python ashell.py "domain public + login public public + lf $syncdir" | awk '{print $4}' | grep '\.ers$' | while read -r ersfile ; do
     datafile=${ersfile%%.*}
-    echo "ersfile=$ersfile"
-    echo "datafile=$datafile"
     python ashell.py "domain public + login public public + get ${syncdir}/${ersfile} + get ${syncdir}/${datafile}"
   done
 done
+
+popd
+sbatch "ncitransfer-convert.job"
 

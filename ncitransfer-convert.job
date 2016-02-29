@@ -1,0 +1,18 @@
+#!/bin/bash -l
+#SBATCH --partition=workq
+#SBATCH --cluster=zeus
+#SBATCH --ntasks=1
+#SBATCH --account=director569
+#SBATCH --time=08:00:00
+#SBATCH --export=SYNC_DIRS,NCI_DIR,SCRATCH_DIR,NCI_USER,NCI_PASSWORD,ATERM,ASHELL
+
+module load gdal 
+
+cd "$SCRATCH_DIR" || exit 1
+
+ls "*.ers" | while read -r ersfile ; do
+  ncfile="${ersfile%%.*}.nc"
+  gdal_translate -of netCDF "${ersfile}" "${ncfile}"
+done
+
+sbatch "ncitransfer-sync.job"
