@@ -1,5 +1,6 @@
 ashell.py
 aterm.jar
+*.out
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
