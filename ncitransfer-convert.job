@@ -4,17 +4,23 @@
 #SBATCH --ntasks=1
 #SBATCH --account=director569
 #SBATCH --time=08:00:00
-#SBATCH --export=SYNC_DIRS,NCI_DIR,SCRATCH_DIR,NCI_USER,NCI_PASSWORD,ATERM,ASHELL
+#SBATCH --export=SYNC_DIRS,NCI_DIR,SCRATCH_DIR,NCI_USER,NCI_PASSWORD,ATERM,ASHELL,CLEANUP,LOG_FILE
+
+source utils.sh
 
 module load gdal 
+
+log "INFO: Beginning netcdf conversions..."
 
 pushd `pwd`
 cd "$SCRATCH_DIR" || exit 1
 
 ls *.ers | while read -r ersfile ; do
   ncfile="${ersfile%%.*}.nc"
-  gdal_translate -of netCDF "${ersfile}" "${ncfile}"
+  gdal_translate -of netCDF "${ersfile}" "${ncfile}" || finish 3 "ERROR: Failure converting $ersfile to NetCDF"
 done
+
+log "INFO: Finished netcdf conversions"
 
 popd
 sbatch "ncitransfer-sync.job"

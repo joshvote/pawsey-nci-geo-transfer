@@ -4,23 +4,31 @@
 #SBATCH --ntasks=1
 #SBATCH --account=director569
 #SBATCH --time=01:00:00
-#SBATCH --export=SYNC_DIRS,NCI_DIR,SCRATCH_DIR,NCI_USER,NCI_PASSWORD,ATERM,ASHELL
+#SBATCH --export=SYNC_DIRS,NCI_DIR,SCRATCH_DIR,NCI_USER,NCI_PASSWORD,ATERM,ASHELL,CLEANUP,LOG_FILE
+
+source utils.sh
+
+log "INFO: Starting file transfer to NCI"
 
 pushd `pwd`
-cp "sync.sh" "$SCRATCH_DIR" || exit 1
-cd "$SCRATCH_DIR" || exit 1
+cp "sync.sh" "$SCRATCH_DIR" || finish 1 "ERROR: Unable to copy sync.sh to $SCRATCH_DIR"
+cd "$SCRATCH_DIR" || finish 1 "ERROR: Unable to access $SCRATCH_DIR"
+chmod +x sync.sh || finish 1 "ERROR: Unable to make sync.sh executable"
+
 
 export COMMANDS_FILE="commands.txt"
 if [ -a $COMMANDS_FILE ]
 then
-  rm $COMMANDS_FILE
+  rm $COMMANDS_FILE || finish 1 "ERROR: unable to delete $COMMANDS_FILE"
 fi
 
 for f in *.nc;
 do
-  echo "rsync -W -t $f $NCI_USER@raijin.nci.org.au:$NCI_DIR" >> "$COMMANDS_FILE"
+  echo "scp -p $f $NCI_USER@raijin.nci.org.au:$NCI_DIR" >> "$COMMANDS_FILE"
 done
 
-./sync.sh || exit 1
+./sync.sh || finish 5 "ERROR: Failure transferring to NCI"
 popd
+
+finish 0 "INFO: File transfers complete"
 
