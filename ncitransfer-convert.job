@@ -8,11 +8,14 @@
 
 module load gdal 
 
+pushd `pwd`
 cd "$SCRATCH_DIR" || exit 1
 
-ls "*.ers" | while read -r ersfile ; do
+ls *.ers | while read -r ersfile ; do
   ncfile="${ersfile%%.*}.nc"
   gdal_translate -of netCDF "${ersfile}" "${ncfile}"
 done
 
+popd
 sbatch "ncitransfer-sync.job"
+

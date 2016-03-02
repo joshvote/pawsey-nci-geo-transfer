@@ -7,7 +7,7 @@
 #SBATCH --export=SYNC_DIRS,NCI_DIR,SCRATCH_DIR,NCI_USER,NCI_PASSWORD,ATERM,ASHELL
 
 module load python
-module load java/8u40
+module load java
 
 IFS=',' read -r -a DIRS <<< "$SYNC_DIRS"
 

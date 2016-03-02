@@ -1,8 +1,8 @@
 #!/bin/bash
 
 #comma seperated directories to look for *.ers files in
-export SYNC_DIRS="/GSWA_Geophysics/WA_Gravity_Grids"
-export NCI_DIR="/g/data1/rl1/GSWA_Geophysics"
+export SYNC_DIRS="/GSWA_Geophysics/WA_Gravity_Grids,/GSWA_Geophysics/WA_Magnetic_Grids,/GSWA_Geophysics/WA_Radiometric_Grids/"
+export NCI_DIR="/g/data1/rl1/GSWA_Geophysics/nc"
 export SCRATCH_DIR="/scratch/director569/transfer-tmp"
 export NCI_USER=""
 export NCI_PASSWORD=""
@@ -24,4 +24,3 @@ if [[ -z "$NCI_USER" || -z "$NCI_PASSWORD" ]]; then
 fi
 
 sbatch "ncitransfer-read.job"
-

@@ -10,5 +10,17 @@ pushd `pwd`
 cp "sync.sh" "$SCRATCH_DIR" || exit 1
 cd "$SCRATCH_DIR" || exit 1
 
-./sync.sh "$NCI_USER" "$NCI_PASSWORD" "$NCI_DIR" || exit 1
+export COMMANDS_FILE="commands.txt"
+if [ -a $COMMANDS_FILE ]
+then
+  rm $COMMANDS_FILE
+fi
+
+for f in *.nc;
+do
+  echo "rsync -W -t $f $NCI_USER@raijin.nci.org.au:$NCI_DIR" >> "$COMMANDS_FILE"
+done
+
+./sync.sh || exit 1
+popd
 
