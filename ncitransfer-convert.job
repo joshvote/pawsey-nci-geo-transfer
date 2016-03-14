@@ -15,8 +15,8 @@ log "INFO: Beginning netcdf conversions..."
 pushd `pwd`
 cd "$SCRATCH_DIR" || exit 1
 
-ls *.ers | while read -r ersfile ; do
-  ncfile="${ersfile%%.*}.nc"
+find . -name "*.ers" -type f -print | while read -r ersfile ; do
+  ncfile="${ersfile/.ers/.nc}"
   gdal_translate -of netCDF "${ersfile}" "${ncfile}" || finish 3 "ERROR: Failure converting $ersfile to NetCDF"
 done
 

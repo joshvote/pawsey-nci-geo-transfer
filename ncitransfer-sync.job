@@ -4,6 +4,7 @@
 #SBATCH --ntasks=1
 #SBATCH --account=director569
 #SBATCH --time=01:00:00
+#SBATCH --mem=8GB
 #SBATCH --export=SYNC_DIRS,NCI_DIR,SCRATCH_DIR,NCI_USER,NCI_PASSWORD,ATERM,ASHELL,CLEANUP,LOG_FILE
 
 source utils.sh
@@ -22,9 +23,8 @@ then
   rm $COMMANDS_FILE || finish 1 "ERROR: unable to delete $COMMANDS_FILE"
 fi
 
-for f in *.nc;
-do
-  echo "scp -p $f $NCI_USER@raijin.nci.org.au:$NCI_DIR" >> "$COMMANDS_FILE"
+find . -name "*.nc" -type f -print | while read -r ncfile ; do
+  echo "scp -p -q $ncfile $NCI_USER@raijin.nci.org.au:$NCI_DIR" >> "$COMMANDS_FILE"
 done
 
 ./sync.sh || finish 5 "ERROR: Failure transferring to NCI"

@@ -24,8 +24,19 @@ for syncdir in "${DIRS[@]}"
 do
   #Look for .ers files in each of our syncdirs
   python ashell.py "domain public + login public public + lf $syncdir" | awk '{print $4}' | grep '\.ers$' | while read -r ersfile ; do
+    #Copy the files to the root tmp directory
     datafile=${ersfile%%.*}
     python ashell.py "domain public + login public public + get ${syncdir}/${ersfile} + get ${syncdir}/${datafile}" || finish 2 "ERROR: Could not download $ersfile or $datafile"
+
+    #Move the files to the subdirectory so the "directory structure" is preserved
+    localdir="${syncdir}"
+    if [[ $localdir == /* ]] ; 
+    then
+      localdir=${localdir#"/"}
+    fi
+    mkdir -p "$localdir" || finish 3 "ERROR: could not create directory $localdir"
+    mv "${ersfile}" "${localdir}" || finish 4 "ERROR: could not move file to $localdir"
+    mv "${datafile}" "${localdir}" || finish 4 "ERROR: could not move file to $localdir"
   done
 done
 

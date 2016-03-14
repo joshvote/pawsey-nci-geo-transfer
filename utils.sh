@@ -6,7 +6,7 @@ function finish {
     if [ "$SCRATCH_DIR" != "" ]
     then
       log "Cleaning up contents of \"$SCRATCH_DIR\""
-      rm $SCRATCH_DIR/*
+      rm -rf $SCRATCH_DIR/*
     fi
   fi
 
