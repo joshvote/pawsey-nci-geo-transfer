@@ -4,7 +4,7 @@
 #SBATCH --ntasks=1
 #SBATCH --account=director569
 #SBATCH --time=08:00:00
-#SBATCH --export=SYNC_DIRS,NCI_DIR,SCRATCH_DIR,NCI_USER,NCI_PASSWORD,ATERM,ASHELL,CLEANUP,LOG_FILE
+#SBATCH --export=SYNC_DIRS,NCI_DIR,SCRATCH_DIR,NCI_USER,NCI_PASSWORD,NCI_HOST,ATERM,ASHELL,CLEANUP,LOG_FILE
 
 source utils.sh
 
@@ -17,6 +17,7 @@ cd "$SCRATCH_DIR" || exit 1
 
 find . -name "*.ers" -type f -print | while read -r ersfile ; do
   ncfile="${ersfile/.ers/.nc}"
+  log "INFO: Converting $ersfile to netcdf..."
   gdal_translate -of netCDF "${ersfile}" "${ncfile}" || finish 3 "ERROR: Failure converting $ersfile to NetCDF"
 done
 

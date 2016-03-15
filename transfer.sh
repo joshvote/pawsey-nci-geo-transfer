@@ -8,10 +8,11 @@ source utils.sh
 
 #comma seperated directories to look for *.ers files in
 export SYNC_DIRS="/GSWA_Geophysics/WA_Gravity_Grids,/GSWA_Geophysics/WA_Magnetic_Grids,/GSWA_Geophysics/WA_Radiometric_Grids/"
-export NCI_DIR="/g/data1/rl1/GSWA_Geophysics/nc"
+export NCI_DIR="/g/data1/rl1"
 export SCRATCH_DIR="/scratch/director569/transfer-tmp"
 export NCI_USER=""
 export NCI_PASSWORD=""
+export NCI_HOST="raijin.nci.org.au"
 export ATERM="`readlink -e aterm.jar`"
 export ASHELL="`readlink -e ashell.py`"
 export CLEANUP="1"
@@ -60,11 +61,18 @@ fi
 echo "Please enter your NCI credentials"
 read -p "User: " NCI_USER
 read -s -p "Password: " NCI_PASSWORD
+echo ""
 
 if [[ -z "$NCI_USER" || -z "$NCI_PASSWORD" ]]; then
   echo "Empty credentials. Aborting"
   exit 1
 fi
 
+
+expect -f testconnection.tcl > /dev/null
+if [[ $? > 0 ]]; then
+  echo "The supplied login credentials are invalid."
+  exit 1
+fi
 sbatch "$START_JOB"
 

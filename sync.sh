@@ -6,9 +6,11 @@ set commands [split [read $f] "\n"]
 close $f
 
 foreach command $commands {
-  spawn {*}$command
-  expect "password:"
-  send "$env(NCI_PASSWORD)\r"
-  expect eof
+  if { [ string length $command ] != 0 } {
+    spawn {*}$command
+    expect "password:"
+    send "$env(NCI_PASSWORD)\r"
+    expect eof
+  }
 }
 
