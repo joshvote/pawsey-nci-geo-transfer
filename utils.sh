@@ -43,3 +43,23 @@ function log {
   fi
 }
 
+#extract_ers_attr <ers_file> <attribute>
+function extract_ers_attr {
+  VALUE=`cat "$1" | grep "$2" | sed -e "s/.*$2.*=.\(.*\)/\1/g"`
+  echo $VALUE
+}
+
+#get_metadata <ers_file_name> <attribute> <metadata_file>
+function get_metadata {
+  while IFS=, read FILE_NAME VARIABLE_NAME VARIABLE_UNITS TITLE SOURCE SUMMARY
+  do
+    if [ "$FILE_NAME" = "$1" ]
+    then
+       echo "${!2}"
+       return 0
+    fi
+  done < "$3"
+  echo ""
+  return 0
+}
+

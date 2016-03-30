@@ -15,6 +15,7 @@ export NCI_PASSWORD=""
 export NCI_HOST="raijin.nci.org.au"
 export ATERM="`readlink -e aterm.jar`"
 export ASHELL="`readlink -e ashell.py`"
+export METADATA_CSV="`readlink -e metadata.csv`"
 export CLEANUP="1"
 export LOG_FILE="transfer.log"
 export START_JOB="ncitransfer-read.job"
@@ -69,7 +70,7 @@ if [[ -z "$NCI_USER" || -z "$NCI_PASSWORD" ]]; then
 fi
 
 
-expect -f testconnection.tcl > /dev/null
+#expect -f testconnection.tcl > /dev/null
 if [[ $? > 0 ]]; then
   echo "The supplied login credentials are invalid."
   exit 1
