@@ -70,7 +70,7 @@ if [[ -z "$NCI_USER" || -z "$NCI_PASSWORD" ]]; then
 fi
 
 
-#expect -f testconnection.tcl > /dev/null
+expect -f testconnection.tcl > /dev/null
 if [[ $? > 0 ]]; then
   echo "The supplied login credentials are invalid."
   exit 1

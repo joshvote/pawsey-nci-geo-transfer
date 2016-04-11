@@ -22,7 +22,7 @@ find . -name "*.ers" -type f -print | while read -r ersfile ; do
 
   md_varname=$(get_metadata "$name" "VARIABLE_NAME" "$METADATA_CSV")
   md_title=$(get_metadata "$name" "TITLE" "$METADATA_CSV")
-  md_units=$(get_metadata "$name" "UNITS" "$METADATA_CSV")
+  md_units=$(get_metadata "$name" "VARIABLE_UNITS" "$METADATA_CSV")
   md_summary=$(get_metadata "$name" "SUMMARY" "$METADATA_CSV")
   md_source=$(get_metadata "$name" "SOURCE" "$METADATA_CSV")
   md_date_created=$(extract_ers_attr "$ersfile" "LastUpdated")
@@ -30,10 +30,20 @@ find . -name "*.ers" -type f -print | while read -r ersfile ; do
 
   gdal_translate -of netCDF -mo "title=$md_title" -mo "summary=$md_summary" -mo "source=$md_source" -mo "date_created=$md_date_created" -mo "product_version=$md_version" "${ersfile}" "${ncfile}" || finish 3 "ERROR: Failure converting $ersfile to NetCDF"
 
-  ncatted -a "long_name,Band1,o,c,$md_title" "$ncfile" || finish 3 "ERROR: Failure writing metadata to $ncfile"
-  ncatted -a "units,Band1,o,c,$md_units" "$ncfile" || finish 3 "ERROR: Failure writing metadata to $ncfile"
-  ncrename -v "Band1,$md_varname" "$ncfile" || finish 3 "ERROR: Failure renaming variable in $ncfile"
+  if [ "$md_title" != "" ]
+  then
+    ncatted -a "long_name,Band1,o,c,$md_title" "$ncfile" || finish 3 "ERROR: Failure writing metadata to $ncfile"
+  fi
 
+  if [ "$md_units" != "" ]
+  then  
+    ncatted -a "units,Band1,o,c,$md_units" "$ncfile" || finish 3 "ERROR: Failure writing metadata to $ncfile"
+  fi
+
+  if [ "$md_varname" != "" ]
+  then
+    ncrename -v "Band1,$md_varname" "$ncfile" || finish 3 "ERROR: Failure renaming variable in $ncfile"
+  fi
 done
 
 log "INFO: Finished netcdf conversions"

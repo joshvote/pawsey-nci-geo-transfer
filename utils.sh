@@ -46,7 +46,7 @@ function log {
 #extract_ers_attr <ers_file> <attribute>
 function extract_ers_attr {
   VALUE=`cat "$1" | grep "$2" | sed -e "s/.*$2.*=.\(.*\)/\1/g"`
-  echo $VALUE
+  echo ${VALUE//[$'\t\r\n"\'']}
 }
 
 #get_metadata <ers_file_name> <attribute> <metadata_file>
