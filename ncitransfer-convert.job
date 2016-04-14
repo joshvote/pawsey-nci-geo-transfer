@@ -17,6 +17,8 @@ pushd `pwd`
 cd "$SCRATCH_DIR" || exit 1
 
 find . -name "*.ers" -type f -print | while read -r ersfile ; do
+  log "INFO: Converting $ersfile ..."
+
   ncfile="${ersfile/.ers/.nc}"
   name=`basename "$ersfile"`
 
@@ -28,10 +30,31 @@ find . -name "*.ers" -type f -print | while read -r ersfile ; do
   md_date_created=$(extract_ers_attr "$ersfile" "LastUpdated")
   md_version=$(extract_ers_attr "$ersfile" "Version")
 
-  gdal_translate -of netCDF -mo "title=$md_title" -mo "summary=$md_summary" -mo "source=$md_source" -mo "date_created=$md_date_created" -mo "product_version=$md_version" "${ersfile}" "${ncfile}" || finish 3 "ERROR: Failure converting $ersfile to NetCDF"
+  gdal_translate -of netCDF "${ersfile}" "${ncfile}" || finish 3 "ERROR: Failure converting $ersfile to NetCDF"
+
+  if [ "$md_version" != "" ]
+  then
+    ncatted -a "product_version,global,o,c,$md_version" "$ncfile" || finish 3 "ERROR: Failure writing metadata to $ncfile"
+  fi
+
+  if [ "$md_date_created" != "" ]
+  then
+    ncatted -a "date_created,global,o,c,$md_date_created" "$ncfile" || finish 3 "ERROR: Failure writing metadata to $ncfile"
+  fi
+
+  if [ "$md_summary" != "" ]
+  then
+    ncatted -a "summary,global,o,c,$md_summary" "$ncfile" || finish 3 "ERROR: Failure writing metadata to $ncfile"
+  fi
+
+  if [ "$md_source" != "" ]
+  then
+    ncatted -a "source,global,o,c,$md_source" "$ncfile" || finish 3 "ERROR: Failure writing metadata to $ncfile"
+  fi
 
   if [ "$md_title" != "" ]
   then
+    ncatted -a "title,global,o,c,$md_title" "$ncfile" || finish 3 "ERROR: Failure writing metadata to $ncfile"
     ncatted -a "long_name,Band1,o,c,$md_title" "$ncfile" || finish 3 "ERROR: Failure writing metadata to $ncfile"
   fi
 
