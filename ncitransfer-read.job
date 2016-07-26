@@ -17,8 +17,8 @@ IFS=',' read -r -a DIRS <<< "$SYNC_DIRS"
 
 pushd `pwd`
 cd "$SCRATCH_DIR" || finish 1 "ERROR: Scratch directory DNE"
-cp "$ATERM" . || finish 1 "ERROR: Could not copy aterm.jar"
-cp "$ASHELL" . || finish 1 "ERROR: Could not copy ashell.py"
+cp --preserve=mode "$ATERM" . || finish 1 "ERROR: Could not copy aterm.jar"
+cp --preserve=mode "$ASHELL" . || finish 1 "ERROR: Could not copy ashell.py"
 
 for syncdir in "${DIRS[@]}"
 do
@@ -36,6 +36,9 @@ do
       localdir=${localdir#"/"}
     fi
     mkdir -p "$localdir" || finish 3 "ERROR: could not create directory $localdir"
+    chmod g+rw  "$localdir" || finish 3 "ERROR: error updating file permissions for directory $localdir"
+    chmod g+rw  "$ersfile" || finish 3 "ERROR: error updating file permissions for .ers file $ersfile"
+    chmod g+rw  "$datafile" || finish 3 "ERROR: error updating file permissions for data file $datafile"
     mv "${ersfile}" "${localdir}" || finish 4 "ERROR: could not move file to $localdir"
     mv "${datafile}" "${localdir}" || finish 4 "ERROR: could not move file to $localdir"
   done

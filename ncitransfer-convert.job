@@ -67,6 +67,8 @@ find . -name "*.ers" -type f -print | while read -r ersfile ; do
   then
     ncrename -v "Band1,$md_varname" "$ncfile" || finish 3 "ERROR: Failure renaming variable in $ncfile"
   fi
+
+  chmod g+rw "$ncfile" || finish 3 "ERROR: Failure updating permissions for: $ncfile"
 done
 
 log "INFO: Finished netcdf conversions"

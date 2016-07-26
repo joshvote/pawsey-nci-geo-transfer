@@ -14,14 +14,15 @@ log "INFO: Starting file transfer to NCI"
 pushd `pwd`
 cp "sync.sh" "$SCRATCH_DIR" || finish 1 "ERROR: Unable to copy sync.sh to $SCRATCH_DIR"
 cd "$SCRATCH_DIR" || finish 1 "ERROR: Unable to access $SCRATCH_DIR"
-chmod +x sync.sh || finish 1 "ERROR: Unable to make sync.sh executable"
-
+chmod 774 sync.sh || finish 1 "ERROR: Unable to make sync.sh executable/group accessible"
 
 export COMMANDS_FILE="commands.txt"
 if [ -a $COMMANDS_FILE ]
 then
   rm $COMMANDS_FILE || finish 1 "ERROR: unable to delete $COMMANDS_FILE"
 fi
+touch "$COMMANDS_FILE" || finish 1 "ERROR: unable to create $COMMANDS_FILE"
+chmod g+rw "$COMMANDS_FILE" || finish 1 "ERROR: unable to made $COMMANDS_FILE group readable"
 
 echo rsync -rpW --chmod 'a+r' --include '*/' --include '*.nc' --exclude '*' . $NCI_USER@$NCI_HOST:$NCI_DIR >> "$COMMANDS_FILE"
 

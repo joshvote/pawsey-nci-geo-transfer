@@ -8,7 +8,6 @@ source utils.sh
 
 #comma seperated directories to look for *.ers files in
 export SYNC_DIRS="/GSWA_Geophysics/WA_Gravity_Grids,/GSWA_Geophysics/WA_Magnetic_Grids,/GSWA_Geophysics/WA_Radiometric_Grids/"
-#export SYNC_DIRS="/GSWA_Geophysics/GSWA_Test_Grids/"
 export NCI_DIR="/g/data1/rl1"
 export SCRATCH_DIR="/scratch/director569/transfer-tmp"
 export NCI_USER=""
@@ -52,7 +51,6 @@ done
 
 if [ ! -f "$LOG_FILE" ]; then
   touch "$LOG_FILE" || finish 1 "ERROR: Unable to create log file $LOG_FILE"
-  chmod g+rw "$LOG_FILE" || finish 1 "ERROR: Unable to make log file group writeable: $LOG_FILE"
 fi
 LOG_FILE="`readlink -e $LOG_FILE`"
 
