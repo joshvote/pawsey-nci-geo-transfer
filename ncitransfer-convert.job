@@ -20,6 +20,7 @@ find . -name "*.ers" -type f -print | while read -r ersfile ; do
   log "INFO: Converting $ersfile ..."
 
   ncfile="${ersfile/.ers/.nc}"
+  tmp_ncfile="${ncfile}.tmp"
   name=`basename "$ersfile"`
 
   md_varname=$(get_metadata "$name" "VARIABLE_NAME" "$METADATA_CSV")
@@ -30,8 +31,12 @@ find . -name "*.ers" -type f -print | while read -r ersfile ; do
   md_date_created=$(extract_ers_attr "$ersfile" "LastUpdated")
   md_version=$(extract_ers_attr "$ersfile" "Version")
 
-  gdal_translate -of netCDF "${ersfile}" "${ncfile}" || finish 3 "ERROR: Failure converting $ersfile to NetCDF"
+  gdal_translate -of netCDF -co FORMAT=NC4C -co COMPRESS=DEFLATE -co WRITE_BOTTOMUP=YES "${ersfile}" "${tmp_ncfile}" || finish 3 "ERROR: Failure converting $ersfile to NetCDF"
+  log "INFO: Chunking $tmp_ncfile"
+  nccopy -u -d 2 -c lat/128,lon/128 "${tmp_ncfile}" "${ncfile}" || finish 3 "ERROR: Failure chunking $tmp_ncfile"
+  rm "$tmp_ncfile" || finish 3 "ERROR: Failure cleaning up $tmp_ncfile"
 
+  log "INFO: Updating metadata for $ncfile"
   if [ "$md_version" != "" ]
   then
     ncatted -a "product_version,global,o,c,$md_version" "$ncfile" || finish 3 "ERROR: Failure writing metadata to $ncfile"

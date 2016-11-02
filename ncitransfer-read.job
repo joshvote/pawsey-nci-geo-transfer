@@ -27,7 +27,15 @@ do
     #Copy the files to the root tmp directory
     datafile=${ersfile%%.*}
     log "INFO: Downloading $datafile ..."
-    python ashell.py "domain public + login public public + get ${syncdir}/${ersfile} + get ${syncdir}/${datafile}" || finish 2 "ERROR: Could not download $ersfile or $datafile"
+    
+    if python ashell.py "domain public + login public public + get ${syncdir}/${ersfile} + get ${syncdir}/${datafile}"; then
+      log "INFO: Successfully downloaded $ersfile and $datafile"
+    else
+      log "ERROR: Could not download $ersfile or $datafile. Cleaning up these files."
+      rm "$ersfile"
+      rm "$datafile"
+      continue
+    fi
 
     #Move the files to the subdirectory so the "directory structure" is preserved
     localdir="${syncdir}"
