@@ -7,8 +7,8 @@ source utils.sh
 
 
 #comma seperated directories to look for *.ers files in
-export SYNC_DIRS="/GSWA_Geophysics/WA_Gravity_Grids,/GSWA_Geophysics/WA_Magnetic_Grids,/GSWA_Geophysics/WA_Radiometric_Grids/"
-#export SYNC_DIRS="/GSWA_Geophysics/GSWA_Test_Grids/"
+export SYNC_DIRS="/GSWA_Geophysics/GSWA_Test_Grids/"
+#export SYNC_DIRS="/GSWA_Geophysics/WA_Gravity_Grids,/GSWA_Geophysics/WA_Magnetic_Grids,/GSWA_Geophysics/WA_Radiometric_Grids/"
 export NCI_DIR="/g/data1/rl1"
 export SCRATCH_DIR="/scratch/director569/transfer-tmp"
 export NCI_USER=""
@@ -59,6 +59,10 @@ LOG_FILE="`readlink -e $LOG_FILE`"
 if [[ -z "$ATERM" || -z "$ASHELL" ]]; then
   echo "aterm.jar and/or ashell.py is missing from the current directory"
   exit 1
+fi
+
+if [ ! -d "$SCRATCH_DIR" ]; then
+  mkdir -p "$SCRATCH_DIR" || finish 1 "ERROR: Unable to create scratch dir $SCRATCH_DIR"
 fi
 
 echo "Please enter your NCI credentials"
